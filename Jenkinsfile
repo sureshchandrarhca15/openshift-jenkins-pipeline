@@ -92,11 +92,11 @@ volumes: [
           nexusArtifactUploader(
 			      nexusVersion: 'nexus3',
 			      protocol: 'http',
-			      nexusUrl: '34.83.196.108:8081',
+			      nexusUrl: '172.30.43.120:8081',
 			      groupId: 'in.javahome',
 		              version: "0.0.5-${BUILD_NUMBER}",
-			      repository: 'kube-pipeline-demo',
-			      credentialsId: 'nexes-admin',
+			      repository: 'openshift-pipeline-demo',
+			      credentialsId: 'nexus3-admin',
 			      artifacts: [
 			      [artifactId: 'myweb',
 			      classifier: '',
@@ -132,16 +132,15 @@ volumes: [
       }
     }
 	  
-stage('Deploy on Kubernetes') {
+stage('Deploy to Openshift Cluster') {
       try {
-        container('kubectl') {
-            withKubeConfig(caCertificate: '', clusterName: 'standard-cluster-1', contextName: '', credentialsId: 'kube-admin', namespace: 'default', serverUrl: 'https://35.247.106.248') {
-		    sh "kubectl set image deployment/tomcat tomcat-container=sureshchandrarhca15/mytomcat:${gitCommit}"
-        }
-	}
+
+
+	sh "oc set image dc/tomcat tomcat-container=sureshchandrarhca15/mytomcat:${gitCommit}"
+      
       }
       catch (Exception e) {
-        println "Failed to deploy on Kubernetes - ${currentBuild.fullDisplayName}"
+        println "Failed to deploy on Openshift Cluster - ${currentBuild.fullDisplayName}"
         throw e
       }
     }
